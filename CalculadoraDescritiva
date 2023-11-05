@@ -1,0 +1,40 @@
+#Calculadora Descritiva
+
+#Entrada de dados
+num1 = float(input('Digite um número: '))
+num2 = float(input('Digite outro número: '))
+operacao = input('Qual operação deseja realizar?(+, -, *, /): ')
+
+#Manipulação de Dados
+if operacao == '+':
+  resultado = num1 + num2
+  print(resultado)
+elif operacao == '-':
+  resultado = num1 - num2
+  print(resultado)
+elif operacao == '*':
+  resultado = num1 * num2
+  print(resultado)
+elif operacao == '/':
+  resultado = num1 / num2
+  print(resultado)
+else:
+  print('Valor inválido! Digite um valor válido:(+, -, *, /)')
+  resultado = 0
+
+#Definindo se o resultado da operação é inteiro ou decimal, negativo ou positivo
+#, par ou ímpar
+if resultado % 1 == 0:
+  print('O resultado é inteiro!')
+else:
+  print('O resultado é decimal!')
+
+if resultado < 0:
+  print('O resultado é negativo!')
+else:
+  print('O resultado é positivo!')
+
+if resultado % 2 == 0:
+  print('O resultado é par!')
+else:
+  print('O resultado é ímpar!')
