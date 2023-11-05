@@ -1,0 +1,29 @@
+#Vamos calcular o desconto no valor do etanol ou diesel
+combustivel = input('Digite o tipo de combustível (E(etanol) ou D(diesel): ')
+quantidade = float(input('Digite a quantidade de litros abastecida: '))
+
+if combustivel == 'E':
+  preco = 1.70 * quantidade
+  print('Preço sem desconto:')
+  print(preco)
+  if 0 < quantidade <= 15:
+    preco = preco - (preco * 0.02)
+    print('Preço com desconto:')
+    print(preco)
+  else:
+    preco = preco - (preco * 0.04)
+    print('Preço com desconto:')
+    print(preco)
+
+if combustivel == 'D':
+  preco = 2.00 * quantidade
+  print('Preço sem desconto:')
+  print(preco)
+  if 0 < quantidade <= 15:
+    preco = preco - (preco * 0.03)
+    print('Preço com desconto:')
+    print(preco)
+  else:
+    preco = preco - (preco * 0.05)
+    print('Preço com desconto:')
+    print(preco)
