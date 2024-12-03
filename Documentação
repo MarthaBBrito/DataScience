@@ -1,0 +1,80 @@
+# Detecção de Fraudes em Transações Financeiras
+
+## 1. Introdução
+Este projeto utiliza aprendizado de máquina para detectar transações fraudulentas em uma base de dados fictícia de operações financeiras. O objetivo principal é identificar padrões em transações e construir um modelo que possa classificar eventos como fraudulentos ou legítimos, otimizando a segurança e a eficiência no setor financeiro.
+
+## 2. Objetivos
+### Objetivo Principal
+- Construir um modelo de aprendizado de máquina para detectar fraudes financeiras em transações.
+
+### Objetivos Secundários
+- Avaliar o desempenho do modelo utilizando métricas como precisão, revocação e F1-score.
+- Identificar fraudes corretamente e analisar os erros do modelo (falsos positivos e falsos negativos).
+- Implementar técnicas para lidar com o desbalanceamento de classes.
+
+## 3. Dados
+### 3.1. Fonte dos Dados
+- Base de dados gerada artificialmente com características de transações financeiras (transferências, pagamentos, saques, depósitos, etc.).
+
+### 3.2. Descrição das Colunas
+| Coluna                 | Descrição                                                                 |
+|------------------------|---------------------------------------------------------------------------|
+| `id_transacao`         | Identificador único da transação                                         |
+| `valor`                | Valor da transação em reais                                              |
+| `tipo_transacao`       | Tipo da transação (`transferência`, `pagamento`, `saque`, `depósito`)    |
+| `idade_conta_dias`     | Tempo de existência da conta em dias                                     |
+| `transacao_internacional` | Indicador de transação internacional (`0` = Não, `1` = Sim)           |
+| `possui_chargeback`    | Indicador de chargeback na transação (`0` = Não, `1` = Sim)              |
+| `fraude`               | Indicador de fraude (`0` = Não Fraudulenta, `1` = Fraudulenta)           |
+
+## 4. Metodologia
+### 4.1. Pré-processamento dos Dados
+- Verificação de valores faltantes e inconsistências.
+- Normalização das variáveis contínuas (como `valor`) para melhorar a performance do modelo.
+- Transformação de variáveis categóricas (`tipo_transacao`) em variáveis dummy.
+
+### 4.2. Divisão dos Dados
+- Conjunto de treino (70%) e teste (30%) para validação do modelo.
+
+### 4.3. Treinamento do Modelo
+- Algoritmo usado: **Random Forest Classifier**.
+- Hiperparâmetros ajustados:
+  - Número de árvores: `100`.
+  - Critério de divisão: `gini`.
+
+### 4.4. Métricas de Avaliação
+- **Precisão (Precision):** Medida de falsos positivos.
+- **Revocação (Recall):** Medida de falsos negativos.
+- **F1-score:** Média harmônica entre precisão e recall.
+- **Acurácia:** Percentual geral de classificações corretas.
+
+## 5. Resultados
+### 5.1. Desempenho do Modelo
+| Métrica               | Classe `0` (Não Fraudulenta) | Classe `1` (Fraudulenta) | Média Ponderada |
+|-----------------------|------------------------------|--------------------------|------------------|
+| **Precisão**          | 1.00                        | 0.88                     | 0.99             |
+| **Revocação**         | 1.00                        | 0.88                     | 0.99             |
+| **F1-score**          | 1.00                        | 0.88                     | 0.99             |
+
+### 5.2. Erros Identificados
+- **Falsos Positivos:** Transações legítimas classificadas como fraudulentas.
+- **Falsos Negativos:** Transações fraudulentas não identificadas pelo modelo.
+
+## 6. Conclusão
+### Pontos Fortes
+- O modelo demonstrou alto desempenho na detecção de transações fraudulentas.
+- Identificou 88% das fraudes no conjunto de teste, com precisão similar (88%).
+
+### Pontos a Melhorar
+- Reduzir os falsos negativos para evitar que fraudes reais não sejam detectadas.
+- Lidar com o desbalanceamento de classes usando técnicas como oversampling ou undersampling.
+
+## 7. Execução
+### Requisitos
+- **Linguagem:** Python 3.x
+- **Bibliotecas:** Pandas, NumPy, Scikit-learn, Matplotlib, Tabulate (opcional).
+
+### Como Executar
+1. Clone o repositório:
+   ```bash
+   git clone <link_repositorio>
