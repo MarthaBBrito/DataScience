@@ -1,0 +1,101 @@
+import os
+import paramiko
+from datetime import datetime
+import pandas as pd
+import time
+
+# Configurações
+hostname = 'seu_servidor_sftp'  # Endereço do servidor SFTP
+username = 'seu_usuario'        # Nome de usuário
+password = 'sua_senha'          # Senha
+remote_path = '/caminho/remoto' # Caminho remoto no servidor SFTP
+local_path = '/caminho/local'   # Caminho local para salvar os arquivos
+last_run_file = 'ultima_execucao.txt'  # Arquivo para armazenar a última execução
+output_csv = 'dados_consolidados.csv'  # Arquivo CSV consolidado
+
+# Função para carregar a última execução
+def carregar_ultima_execucao():
+    if os.path.exists(last_run_file):
+        with open(last_run_file, 'r') as f:
+            return datetime.fromisoformat(f.read().strip())
+    return datetime.min  # Retorna a data mínima se for a primeira execução
+
+# Função para salvar a última execução
+def salvar_ultima_execucao():
+    with open(last_run_file, 'w') as f:
+        f.write(datetime.now().isoformat())
+
+# Função para processar um arquivo (adaptada para diferentes formatos)
+def processar_arquivo(caminho_arquivo):
+    extensao = os.path.splitext(caminho_arquivo)[1].lower()
+
+    if extensao == '.csv':
+        return pd.read_csv(caminho_arquivo)
+    elif extensao == '.json':
+        with open(caminho_arquivo, 'r') as f:
+            dados = json.load(f)
+        return pd.DataFrame(dados)
+    elif extensao == '.xlsx' or extensao == '.xls':
+        return pd.read_excel(caminho_arquivo)
+    elif extensao == '.txt':
+        return pd.read_csv(caminho_arquivo, delimiter='\t')  # Ajuste o delimitador conforme necessário
+    else:
+        raise ValueError(f"Formato de arquivo não suportado: {extensao}")
+
+# Iniciar o cálculo do tempo de processamento
+inicio = time.time()
+
+# Conectar ao servidor SFTP
+ssh = paramiko.SSHClient()
+ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+ssh.connect(hostname, username=username, password=password)
+sftp = ssh.open_sftp()
+
+# Carregar a última execução
+ultima_execucao = carregar_ultima_execucao()
+
+# Listar arquivos no servidor e identificar novos ou modificados
+arquivos_processar = []
+for arquivo in sftp.listdir(remote_path):
+    caminho_remoto = f"{remote_path}/{arquivo}"
+    atributos = sftp.stat(caminho_remoto)
+    data_modificacao = datetime.fromtimestamp(atributos.st_mtime)
+
+    # Verificar se o arquivo foi modificado após a última execução
+    if data_modificacao > ultima_execucao:
+        arquivos_processar.append((caminho_remoto, arquivo, data_modificacao))
+
+# Baixar e processar arquivos novos ou modificados
+dados_consolidados = []
+for caminho_remoto, nome_arquivo, data_modificacao in arquivos_processar:
+    caminho_local = os.path.join(local_path, nome_arquivo)
+    sftp.get(caminho_remoto, caminho_local)
+    print(f"Arquivo baixado: {nome_arquivo} (Modificado em: {data_modificacao})")
+
+    # Processar o arquivo
+    try:
+        dados = processar_arquivo(caminho_local)
+        dados_consolidados.append(dados)
+    except ValueError as e:
+        print(f"Erro ao processar {nome_arquivo}: {e}")
+
+# Consolidar dados em um único DataFrame
+if dados_consolidados:
+    df_consolidado = pd.concat(dados_consolidados, ignore_index=True)
+    # Salvar dados consolidados em um arquivo CSV
+    df_consolidado.to_csv(output_csv, index=False)
+    print(f"Dados consolidados salvos em {output_csv}")
+else:
+    print("Nenhum arquivo novo ou modificado encontrado.")
+
+# Salvar a última execução
+salvar_ultima_execucao()
+
+# Fechar conexão
+sftp.close()
+ssh.close()
+
+# Calcular e exibir o tempo total de processamento
+fim = time.time()
+tempo_total = fim - inicio
+print(f"Tempo total de processamento: {tempo_total:.2f} segundos")
